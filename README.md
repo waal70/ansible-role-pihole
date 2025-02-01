@@ -1,13 +1,25 @@
 waal70.pihole
 =========
 
-Installs pihole on a dummy network interface (it assumes you have some other DNS running).  
+Determines whether samba-ad-dc is active on this device. This means that DNS ports are taken.
+It will solve this by installing pihole on a dummy interface (eth53) and binding pihole to it.
+
 If requested, it will purge the pihole adlist database and repopulate, using mongodb commands.
+
+In case of a dummy interface, it will take the prefix as mentioned in defaults/main.yml and it will
+append the same last octet of your main interface:
+Suppose you have a dummy prefix of 10.1.1., and your main ip address is 10.0.0.5,
+your dummy ip will be 10.1.1.5, and the IPv6 will end in ::5/64
+
+Make sure you use a prefix that resides in the private (RFC1918) address space if IPv4 and then choose one
+that does not collide with your local IP-numbering scheme (i.e. VLANs). If you do not do this, you will
+risk routing errors and/or unavailability.
+Make sure you use a IPv6 prefix that resides in your own numbering block (i.e. fits within the
+delegated address block).
 
 Requirements
 ------------
 
-Assumes you have some form of DNS running on the proper network interface (e.g. samba DNS)  
 In pihole.yml, a reference is made to a client list with custom DNS entries. For now it defaults to
     ~/ansible/home/inventory/client.list
 An example file is provided in this role's files folder (custom.list)  
