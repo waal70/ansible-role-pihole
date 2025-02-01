@@ -1,2 +1,4 @@
 ---
-# handlers file for waal70.pihole
+- name: Update gravity
+  ansible.builtin.command:
+    cmd: pihole -g &

@@ -1,0 +1,21 @@
+---
+- name: Get rid of incorrect service definition file
+  ansible.builtin.file:
+    path: /etc/systemd/system/pihole-FTL.service
+    state: absent
+  when: install_pihole
+
+- name: Correct service startup file in init.d (might be necessary on some hardware)
+  ansible.builtin.template:
+    src: etc/init.d/pihole-FTL.j2
+    dest: /etc/init.d/pihole-FTL
+    mode: "0755"
+  when: install_pihole
+
+- name: Start/restart the pihole-FTL service
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+    name: pihole-FTL
+    state: started
+    enabled: true
+  when: install_pihole

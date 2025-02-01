@@ -1,2 +1,12 @@
 ---
 # tasks file for waal70.pihole
+- name: Interface detection
+  ansible.builtin.import_tasks: interface-detection.yml
+
+- name: Display target interface
+  ansible.builtin.debug:
+    msg: "Applying pihole on: {{ target_interface }}"
+
+- name: Include pi-hole installation and configuration tasks
+  ansible.builtin.import_tasks: pi-hole.yml
+  when: do_pihole or install_pihole
