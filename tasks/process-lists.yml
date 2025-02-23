@@ -5,4 +5,6 @@
        VALUES ({{ item.id }}, '{{ item.type }}', '{{ item.domain }}', {{ item.enabled }}, {{ item.date_added }},
         {{ item.date_modified }}, '{{ item.comment }}');"
   loop: "{{ process_lists }}"
+  retries: 5
+  delay: 5
   changed_when: true
