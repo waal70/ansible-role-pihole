@@ -1,6 +1,8 @@
 galaxy_info:
   author: waal70 (Andre)
   description: Role to install pi-hole on a system. Will determine existence of samba-ad-dc and create dummy interface for pi-hole if needed.
+    Please note that this role is now only working with PiHole version 6.0 and above.
+  company: waal70
   platforms:
     - name: Debian
       versions:
