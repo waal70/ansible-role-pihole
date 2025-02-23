@@ -39,7 +39,7 @@
     mode: "0755"
 
 # setupVars is replaced by pihole.toml starting from version 6.0
-- name: Prepare the setupVars in order to make unattended install
+- name: Prepare the settings file in order to make unattended install
   ansible.builtin.template:
     src: etc/pihole/pihole.toml.j2
     dest: /etc/pihole/pihole.toml
