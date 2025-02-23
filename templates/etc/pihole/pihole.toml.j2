@@ -1,7 +1,7 @@
 # Pi-hole configuration file (v6.0.2)
 # Encoding: UTF-8
 # This file is managed by pihole-FTL
-# Last updated on 2025-02-23 11:38:30 CET
+# Last updated on 2025-02-23 21:59:04 CET
 
 [dns]
   # Array of upstream DNS servers used by Pi-hole
@@ -189,7 +189,7 @@
   #       configuration file. This is useful if you want to manually configure the
   #       listening mode in auxiliary configuration files. This option is really meant
   #       for advanced users only, support for this option may be limited.
-  listeningMode = "BIND"
+  listeningMode = "LOCAL"
 
   # Log DNS queries and replies to pihole.log
   queryLogging = false ### CHANGED, default = true
@@ -480,7 +480,7 @@
 
   [ntp.ipv4]
     # Should FTL act as network time protocol (NTP) server (IPv4)?
-    active = false
+    active = false ### CHANGED, default = true
 
     # IPv4 address to listen on for NTP requests
     #
@@ -490,7 +490,7 @@
 
   [ntp.ipv6]
     # Should FTL act as network time protocol (NTP) server (IPv6)?
-    active = false
+    active = false ### CHANGED, default = true
 
     # IPv6 address to listen on for NTP requests
     #
@@ -500,7 +500,7 @@
 
   [ntp.sync]
     # Should FTL try to synchronize the system time with an upstream NTP server?
-    active = false
+    active = false ### CHANGED, default = true
 
     # NTP upstream server to sync with, e.g., "pool.ntp.org". Note that the NTP server
     # should be located as close as possible to you in order to minimize the time offset
@@ -527,7 +527,7 @@
       device = ""
 
       # Should the RTC be set to UTC?
-      utc = true
+      utc = false
 
 [resolver]
   # Should FTL try to resolve IPv4 addresses to hostnames?
@@ -570,11 +570,11 @@
 [database]
   # Should FTL load information from the database on startup to be aware of the most
   # recent history?
-  DBimport = false
+  DBimport = false ### CHANGED, default = true
 
   # How long should queries be stored in the database [days]?
   # Setting this value to 0 will disable the database.
-  maxDBdays = 0
+  maxDBdays = 0 ### CHANGED, default = 91
 
   # How often do we store queries in FTL's database [seconds]?
   DBinterval = 60
@@ -657,7 +657,7 @@
   #
   # Possible values are:
   #     comma-separated list of <[ip_address:]port>
-  port = "{{ ansible_default_ipv4.address }}:80o,{{ ansible_default_ipv4.address }}:443os,{{ ansible_default_ipv6.address }}:80o,{{ ansible_default_ipv6.address }}:443os"
+  port = "80o,443os,[::]:80o,[::]:443os"
 
   # Maximum number of worker threads allowed.
   # The Pi-hole web server handles each incoming connection in a separate thread.
@@ -685,7 +685,7 @@
 
     # Should Pi-hole backup and restore sessions from the database? This is useful if you
     # want to keep your sessions after a restart of the web interface.
-    restore = true
+    restore = false
 
   [webserver.tls]
     # Path to the TLS (SSL) certificate file. All directories along the path must be
@@ -942,7 +942,7 @@
   # This setting takes any integer value between 0 and 300 seconds. To prevent delayed
   # startup while the system is already running and FTL is restarted, the delay only
   # takes place within the first 180 seconds (hard-coded) after booting.
-  delay_startup = 10
+  delay_startup = 10 ### CHANGED, default = 0
 
   # Set niceness of pihole-FTL. Defaults to -10 and can be disabled altogether by setting
   # a value of -999. The nice value is an attribute that can be used to influence the
@@ -959,7 +959,7 @@
   addr2line = true
 
   # Should FTL load additional dnsmasq configuration files from /etc/dnsmasq.d/?
-  etc_dnsmasq_d = false
+  etc_dnsmasq_d = true ### CHANGED, default = false
 
   # Additional lines to inject into the generated dnsmasq configuration.
   # Warning: This is an advanced setting and should only be used with care. Incorrectly
@@ -1138,5 +1138,5 @@
   all = false
 
 # Configuration statistics:
-# 152 total entries out of which 146 entries are default
-# --> 6 entries are modified
+# 152 total entries out of which 139 entries are default
+# --> 13 entries are modified
