@@ -16,6 +16,21 @@
     file: install-pihole.yml
   when: install_pihole
 
+# Check if pihole-FTL is running. If not, we will try to fix it
+- name: Check status of pihole-FTL
+  ansible.builtin.systemd:
+    name: pihole-FTL
+  register: pihole_ftl_status
+
+- name: Tell user the status of pihole-FTL
+  ansible.builtin.debug:
+    msg: "FTL is {{ pihole_ftl_status.status.ActiveState }}. Trying corrective action."
+  when: pihole_ftl_status.status.ActiveState != "active"
+
+- name: Take corrective action if FTL not running
+  ansible.builtin.include_tasks: correct-systemd-piholeFTL.yml
+  when: pihole_ftl_status.status.ActiveState != "active"
+
 # Do not mess with the db if there is no db (should not occur at this point in the script)
 - name: Import tasks to update the gravity database with adlists, and white- and blacklists
   ansible.builtin.import_tasks:

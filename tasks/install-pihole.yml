@@ -50,17 +50,3 @@
     cmd: "curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended"
   when: install_pihole
   changed_when: true
-
-- name: Check status of pihole-FTL
-  ansible.builtin.systemd:
-    name: pihole-FTL
-  register: pihole_ftl_status
-
-- name: Tell user the status of pihole-FTL
-  ansible.builtin.debug:
-    msg: "FTL is {{ pihole_ftl_status.status.ActiveState }}. Trying corrective action."
-  when: pihole_ftl_status.status.ActiveState != "active"
-
-- name: Take corrective action if FTL not running
-  ansible.builtin.include_tasks: correct-systemd-piholeFTL.yml
-  when: pihole_ftl_status.status.ActiveState != "active"
