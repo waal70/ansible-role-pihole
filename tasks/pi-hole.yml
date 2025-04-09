@@ -16,6 +16,16 @@
     file: install-pihole.yml
   when: install_pihole
 
+- name: Upgrade pi-hole if it is already installed
+  ansible.builtin.command:
+    cmd: pihole -up
+  environment:
+    PIHOLE_SKIP_OS_CHECK: 'true'
+  become: true
+  register: pihole_update
+  when: pihole_db.stat.exists and not install_pihole
+  changed_when: "'Everything is up to date!' not in pihole_update.stdout"
+
 # Check if pihole-FTL is running. If not, we will try to fix it
 - name: Check status of pihole-FTL
   ansible.builtin.systemd:

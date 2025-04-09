@@ -1,3 +1,4 @@
+# Added retries, delay to deal with slower systems
 - name: Loop through all white and blacklists, adding to domainlist table
   ansible.builtin.command:
     cmd: >
@@ -7,4 +8,6 @@
   loop: "{{ process_lists }}"
   retries: 5
   delay: 5
+  register: resultlists
+  until: resultlists is not failed
   changed_when: true
