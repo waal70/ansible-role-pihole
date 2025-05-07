@@ -1,0 +1,162 @@
+filters:
+- enabled: true
+  id: 1
+  name: Ansible pre-configured
+  url: https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+- enabled: true
+  id: 2
+  name: Ansible pre-configured
+  url: http://sysctl.org/cameleon/hosts
+- enabled: true
+  id: 3
+  name: Ansible pre-configured
+  url: https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt
+- enabled: true
+  id: 4
+  name: Ansible pre-configured
+  url: https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt
+- enabled: true
+  id: 5
+  name: Ansible pre-configured
+  url: https://reddestdream.github.io/Projects/MinimalHosts/etc/MinimalHostsBlocker/minimalhosts
+- enabled: true
+  id: 6
+  name: Ansible pre-configured
+  url: https://raw.githubusercontent.com/StevenBlack/hosts/master/data/KADhosts/hosts
+- enabled: true
+  id: 7
+  name: Ansible pre-configured
+  url: https://raw.githubusercontent.com/StevenBlack/hosts/master/data/add.Spam/hosts
+- enabled: true
+  id: 8
+  name: Ansible pre-configured
+  url: https://v.firebog.net/hosts/static/w3kbl.txt
+- enabled: true
+  id: 9
+  name: Ansible pre-configured
+  url: https://adaway.org/hosts.txt
+- enabled: true
+  id: 10
+  name: Ansible pre-configured
+  url: https://v.firebog.net/hosts/AdguardDNS.txt
+- enabled: true
+  id: 11
+  name: Ansible pre-configured
+  url: https://v.firebog.net/hosts/Easylist.txt
+- enabled: true
+  id: 12
+  name: Ansible pre-configured
+  url: https://raw.githubusercontent.com/StevenBlack/hosts/master/data/UncheckyAds/hosts
+- enabled: true
+  id: 13
+  name: Ansible pre-configured
+  url: https://v.firebog.net/hosts/Easyprivacy.txt
+- enabled: true
+  id: 14
+  name: Ansible pre-configured
+  url: https://v.firebog.net/hosts/Prigent-Ads.txt
+- enabled: true
+  id: 15
+  name: Ansible pre-configured
+  url: https://raw.githubusercontent.com/StevenBlack/hosts/master/data/add.2o7Net/hosts
+- enabled: true
+  id: 16
+  name: Ansible pre-configured
+  url: https://s3.amazonaws.com/lists.disconnect.me/simple_malvertising.txt
+- enabled: true
+  id: 17
+  name: Ansible pre-configured
+  url: https://bitbucket.org/ethanr/dns-blacklists/raw/8575c9f96e5b4a1308f2f12394abd86d0927a4a0/bad_lists/Mandiant_APT1_Report_Appendix_D.txt
+- enabled: true
+  id: 18
+  name: Ansible pre-configured
+  url: https://v.firebog.net/hosts/Prigent-Malware.txt
+- enabled: true
+  id: 19
+  name: Ansible pre-configured
+  url: https://raw.githubusercontent.com/StevenBlack/hosts/master/data/add.Risk/hosts
+- enabled: true
+  id: 20
+  name: Ansible pre-configured
+  url: https://raw.githubusercontent.com/imkarthikk/pihole-facebook/master/pihole-facebook.txt
+- enabled: true
+  id: 21
+  name: Ansible pre-configured
+  url: https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt
+- enabled: true
+  id: 22
+  name: Ansible pre-configured
+  url: https://blocklistproject.github.io/Lists/alt-version/abuse-nl.txt
+- enabled: true
+  id: 23
+  name: Ansible pre-configured
+  url: https://blocklistproject.github.io/Lists/alt-version/ads-nl.txt
+- enabled: true
+  id: 24
+  name: Ansible pre-configured
+  url: https://blocklistproject.github.io/Lists/alt-version/crypto-nl.txt
+- enabled: true
+  id: 25
+  name: Ansible pre-configured
+  url: https://blocklistproject.github.io/Lists/alt-version/drugs-nl.txt
+- enabled: true
+  id: 26
+  name: Ansible pre-configured
+  url: https://blocklistproject.github.io/Lists/alt-version/fraud-nl.txt
+- enabled: true
+  id: 27
+  name: Ansible pre-configured
+  url: https://blocklistproject.github.io/Lists/alt-version/gambling-nl.txt
+- enabled: true
+  id: 28
+  name: Ansible pre-configured
+  url: https://blocklistproject.github.io/Lists/alt-version/malware-nl.txt
+- enabled: true
+  id: 29
+  name: Ansible pre-configured
+  url: https://blocklistproject.github.io/Lists/alt-version/phishing-nl.txt
+- enabled: true
+  id: 30
+  name: Ansible pre-configured
+  url: https://blocklistproject.github.io/Lists/alt-version/ransomware-nl.txt
+- enabled: true
+  id: 31
+  name: Ansible pre-configured
+  url: https://blocklistproject.github.io/Lists/alt-version/redirect-nl.txt
+- enabled: true
+  id: 32
+  name: Ansible pre-configured
+  url: https://blocklistproject.github.io/Lists/alt-version/scam-nl.txt
+- enabled: true
+  id: 33
+  name: Ansible pre-configured
+  url: https://blocklistproject.github.io/Lists/alt-version/tracking-nl.txt
+- enabled: true
+  id: 34
+  name: Ansible pre-configured
+  url: https://gist.githubusercontent.com/leviem1/94ee89e816b4d63298a2fb5c9f822bc3/raw/3f3eb67e5cd7845fd0ac57b674a1f2e793012457/fangxiao-domains-pihole-blocklist-11-2022
+- enabled: true
+  id: 35
+  name: Ansible pre-configured
+  url: https://big.oisd.nl/
+- enabled: true
+  id: 36
+  name: Ansible pre-configured
+  url: https://nsfw.oisd.nl
+- enabled: true
+  id: 37
+  name: Ansible pre-configured
+  url: https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/fake.txt
+- enabled: true
+  id: 38
+  name: Ansible pre-configured
+  url: https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.txt
+- enabled: true
+  id: 39
+  name: Ansible pre-configured
+  url: https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/tif.txt
+- enabled: true
+  id: 40
+  name: Ansible pre-configured
+  url: https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/hoster.txt
+
