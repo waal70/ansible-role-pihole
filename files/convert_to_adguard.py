@@ -1,7 +1,8 @@
+"""Module providing a function to convert pihole adlists to adguard format."""
+import sys
 import json
 import yaml
-import sys
-from datetime import datetime, timezone
+
 
 def convert_adlists(adlists_json):
     """Convert Pi-hole adlists to AdGuard Home filters format."""
@@ -31,6 +32,7 @@ def convert_adlists(adlists_json):
     return {'filters': filters}
 
 def main():
+    """Function performing the conversion."""
     if len(sys.argv) != 2:
         print("Usage: python3 convert_to_adguard.py myadlist.json > adguard_filters.yaml")
         sys.exit(1)
@@ -39,7 +41,7 @@ def main():
 
     # Read Pi-hole adlists
     try:
-        with open(adlists_file, 'r') as f:
+        with open(adlists_file, 'r', encoding="utf-8") as f:
             adlists_json = f.read()
     except FileNotFoundError:
         print(f"Error: Pi-hole adlists file {adlists_file} not found", file=sys.stderr)
