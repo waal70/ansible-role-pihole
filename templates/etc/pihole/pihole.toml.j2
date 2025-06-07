@@ -1,7 +1,7 @@
-# Pi-hole configuration file (v6.0.2)
+# Pi-hole configuration file (v6.2.2)
 # Encoding: UTF-8
 # This file is managed by pihole-FTL
-# Last updated on 2025-02-23 21:59:04 CET
+# Last updated on 2025-06-07 13:12:44 CEST
 
 [dns]
   # Array of upstream DNS servers used by Pi-hole
@@ -43,7 +43,7 @@
   # Should FTL hide queries made by localhost?
   ignoreLocalhost = false
 
-  # Should FTL should analyze and show internally generated DNSSEC queries?
+  # Should FTL analyze and show internally generated DNSSEC queries?
   showDNSSEC = true
 
   # Should FTL analyze *only* A and AAAA queries?
@@ -103,7 +103,8 @@
   # Possible values are:
   #     Array of custom DNS records each one in HOSTS form: "IP HOSTNAME"
   hosts = [
-    "2a10:3781:3623:1:e65f:1ff:fe82:c016 adpi0.andrecatherine.net"
+    "2a10:3781:3623:2:e65f:1ff:fe82:c016 adpi0.andrecatherine.net",
+    "2a10:3781:3623:2:e65f:1ff:fe82:c016 adpi0.home.andrecatherine.net"
   ] ### CHANGED, default = []
 
   # If set, A and AAAA queries for plain names, without dots or domain parts, are never
@@ -114,26 +115,31 @@
   # same way as for DHCP-derived names
   expandHosts = false
 
-  # The DNS domain used by your Pi-hole to expand hosts and for DHCP.
+  # The DNS domain used by your Pi-hole.
   #
-  # Only if DHCP is enabled below: For DHCP, this has two effects; firstly it causes the
-  # DHCP server to return the domain to any hosts which request it, and secondly it sets
-  # the domain which it is legal for DHCP-configured hosts to claim. The intention is to
-  # constrain hostnames so that an untrusted host on the LAN cannot advertise its name
-  # via DHCP as e.g. "google.com" and capture traffic not meant for it. If no domain
-  # suffix is specified, then any DHCP hostname with a domain part (ie with a period)
-  # will be disallowed and logged. If a domain is specified, then hostnames with a
-  # domain part are allowed, provided the domain part matches the suffix. In addition,
-  # when a suffix is set then hostnames without a domain part have the suffix added as
-  # an optional domain part. For instance, we can set domain=mylab.com and have a
-  # machine whose DHCP hostname is "laptop". The IP address for that machine is
-  # available both as "laptop" and "laptop.mylab.com".
+  # This DNS domain is purely local. FTL may answer queries from its local cache and
+  # configuration but *never* forwards any requests upstream *unless* you have
+  # configured a dns.revServer exactly for this domain. In the latter case, all queries
+  # for this domain are sent exclusively to this server (including reverse lookups).
+  #
+  # For DHCP, this has two effects; firstly it causes the DHCP server to return the
+  # domain to any hosts which request it, and secondly it sets the domain which it is
+  # legal for DHCP-configured hosts to claim. The intention is to constrain hostnames so
+  # that an untrusted host on the LAN cannot advertise its name via DHCP as e.g.
+  # "google.com" and capture traffic not meant for it. If no domain suffix is specified,
+  # then any DHCP hostname with a domain part (ie with a period) will be disallowed and
+  # logged. If a domain is specified, then hostnames with a domain part are allowed,
+  # provided the domain part matches the suffix. In addition, when a suffix is set then
+  # hostnames without a domain part have the suffix added as an optional domain part.
+  # For instance, we can set domain=mylab.com and have a machine whose DHCP hostname is
+  # "laptop". The IP address for that machine is available both as "laptop" and
+  # "laptop.mylab.com".
   #
   # You can disable setting a domain by setting this option to an empty string.
   #
   # Possible values are:
   #     <any valid domain>
-  domain = "lan"
+  domain = "home.andrecatherine.net" ### CHANGED, default = "lan"
 
   # Should all reverse lookups for private IP ranges (i.e., 192.168.x.y, etc) which are
   # not found in /etc/hosts or the DHCP leases file be answered with "no such domain"
@@ -147,7 +153,7 @@
   #
   # Possible values are:
   #     a valid interface name
-  interface = "{{ target_interface }}" ### CHANGED, default = ""
+  interface = "{{ target_interface }}" ### CHANGED, default = "eth0"
 
   # Add A, AAAA and PTR records to the DNS. This adds one or more names to the DNS with
   # associated IPv4 (A) and IPv6 (AAAA) records
@@ -302,17 +308,22 @@
     edns = "TEXT"
 
   [dns.specialDomains]
-    # Should Pi-hole always replies with NXDOMAIN to A and AAAA queries of
+    # Should Pi-hole always reply with NXDOMAIN to A and AAAA queries of
     # use-application-dns.net to disable Firefox automatic DNS-over-HTTP? This is
     # following the recommendation on
     # https://support.mozilla.org/en-US/kb/configuring-networks-disable-dns-over-https
     mozillaCanary = true
 
-    # Should Pi-hole always replies with NXDOMAIN to A and AAAA queries of mask.icloud.com
+    # Should Pi-hole always reply with NXDOMAIN to A and AAAA queries of mask.icloud.com
     # and mask-h2.icloud.com to disable Apple's iCloud Private Relay to prevent Apple
     # devices from bypassing Pi-hole? This is following the recommendation on
     # https://developer.apple.com/support/prepare-your-network-for-icloud-private-relay
     iCloudPrivateRelay = true
+
+    # Should Pi-hole always reply with NODATA to all queries to zone resolver.arpa to
+    # prevent devices from bypassing Pi-hole using Discovery of Designated Resolvers? This
+    # is based on recommendations at the end of RFC 9462, section 4.
+    designatedResolver = true
 
     [dns.reply.host]
       # Use a specific IPv4 address for the Pi-hole host? By default, FTL determines the
@@ -374,17 +385,17 @@
     # For this setting, both numbers, the maximum number of queries within a given time,
     # and the length of the time interval (seconds) have to be specified. For instance, if
     # you want to set a rate limit of 1 query per hour, the option should look like
-    # RATE_LIMIT=1/3600. The time interval is relative to when FTL has finished starting
-    # (start of the daemon + possible delay by DELAY_STARTUP) then it will advance in
-    # steps of the rate-limiting interval. If a client reaches the maximum number of
-    # queries it will be blocked until the end of the current interval. This will be
-    # logged to /var/log/pihole/FTL.log, e.g. Rate-limiting 10.0.1.39 for at least 44
-    # seconds. If the client continues to send queries while being blocked already and
-    # this number of queries during the blocking exceeds the limit the client will
-    # continue to be blocked until the end of the next interval (FTL.log will contain
-    # lines like Still rate-limiting 10.0.1.39 as it made additional 5007 queries). As
-    # soon as the client requests less than the set limit, it will be unblocked (Ending
-    # rate-limitation of 10.0.1.39).
+    # dns.rateLimit.count=1 and dns.rateLimit.interval=3600. The time interval is relative
+    # to when FTL has finished starting (start of the daemon + possible delay by
+    # DELAY_STARTUP) then it will advance in steps of the rate-limiting interval. If a
+    # client reaches the maximum number of queries it will be blocked until the end of the
+    # current interval. This will be logged to /var/log/pihole/FTL.log, e.g. Rate-limiting
+    # 10.0.1.39 for at least 44 seconds. If the client continues to send queries while
+    # being blocked already and this number of queries during the blocking exceeds the
+    # limit the client will continue to be blocked until the end of the next interval
+    # (FTL.log will contain lines like Still rate-limiting 10.0.1.39 as it made additional
+    # 5007 queries). As soon as the client requests less than the set limit, it will be
+    # unblocked (Ending rate-limitation of 10.0.1.39).
     # Rate-limiting may be disabled altogether by setting both values to zero (this
     # results in the same behavior as before FTL v5.7).
     # How many queries are permitted...
@@ -527,7 +538,7 @@
       device = ""
 
       # Should the RTC be set to UTC?
-      utc = false
+      utc = false ### CHANGED, default = true
 
 [resolver]
   # Should FTL try to resolve IPv4 addresses to hostnames?
@@ -664,13 +675,50 @@
   # Therefore, the value of this option is effectively the number of concurrent HTTP
   # connections that can be handled. Any other connections are queued until they can be
   # processed by a unoccupied thread.
-  # The default value of 0 means that the number of threads is automatically determined
-  # by the number of online CPU cores minus 1 (e.g., launching up to 8-1 = 7 threads on
-  # 8 cores). Any other value specifies the number of threads explicitly. A hard-coded
-  # maximum of 64 threads is enforced for this option.
   # The total number of threads you see may be lower than the configured value as
   # threads are only created when needed due to incoming connections.
-  threads = 0
+  # The value 0 means the number of threads is 50 (as per default settings of CivetWeb)
+  # for backwards-compatible behavior.
+  threads = 50
+
+  # Additional HTTP headers added to the web server responses.
+  # The headers are added to all responses, including those for the API.
+  # Note about the default additional headers:
+  # - X-DNS-Prefetch-Control: off: Usually browsers proactively perform domain name
+  # resolution on links that the user may choose to follow. We disable DNS prefetching
+  # here.
+  # - Content-Security-Policy: [...] 'unsafe-inline' is both required by Chart.js
+  # styling some elements directly, and index.html containing some inlined Javascript
+  # code.
+  # - X-Frame-Options: DENY: The page can not be displayed in a frame, regardless of the
+  # site attempting to do so.
+  # - X-Xss-Protection: 0: Disables XSS filtering in browsers that support it. This
+  # header is usually enabled by default in browsers, and is not recommended as it can
+  # hurt the security of the site.
+  # (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection).
+  # - X-Content-Type-Options: nosniff: Marker used by the server to indicate that the
+  # MIME types advertised in the  Content-Type headers should not be changed and be
+  # followed. This allows to opt-out of MIME type sniffing, or, in other words, it is a
+  # way to say that the webmasters knew what they were doing. Site security testers
+  # usually expect this header to be set.
+  # - Referrer-Policy: strict-origin-when-cross-origin: A referrer will be sent for
+  # same-site origins, but cross-origin requests will send no referrer information.
+  # The latter four headers are set as expected by https://securityheaders.io
+  #
+  # Possible values are:
+  #     array of HTTP headers
+  headers = [
+    "Content-Security-Policy: default-src 'self' 'unsafe-inline';",
+    "X-Frame-Options: DENY",
+    "X-XSS-Protection: 0",
+    "X-Content-Type-Options: nosniff",
+    "Referrer-Policy: strict-origin-when-cross-origin"
+  ] ### CHANGED, default = [ "X-DNS-Prefetch-Control: off", "Content-Security-Policy: default-src 'self' 'unsafe-inline';", "X-Frame-Options: DENY", "X-XSS-Protection: 0", "X-Content-Type-Options: nosniff", "Referrer-Policy: strict-origin-when-cross-origin" ]
+
+  # Should the web server serve all files in webserver.paths.webroot directory? If
+  # disabled, only files within the path defined through webserver.paths.webhome and
+  # /api will be served.
+   serve_all = true ### CHANGED, default = false
 
   [webserver.session]
     # Session timeout in seconds. If a session is inactive for more than this time, it will
@@ -685,7 +733,7 @@
 
     # Should Pi-hole backup and restore sessions from the database? This is useful if you
     # want to keep your sessions after a restart of the web interface.
-    restore = false
+    restore = false ### CHANGED, default = true
 
   [webserver.tls]
     # Path to the TLS (SSL) certificate file. All directories along the path must be
@@ -714,6 +762,22 @@
     # Possible values are:
     #     <valid subpath>, both slashes are needed!
     webhome = "/admin/"
+
+    # Prefix where the web interface is served
+    # This is useful when you are using a reverse proxy serving the web interface, e.g.,
+    # at http://<ip>/pihole/admin/ instead of http://<ip>/admin/. In this example, the
+    # prefix would be "/pihole". Note that the prefix has to be stripped away by the
+    # reverse proxy, e.g., for traefik:
+    # - traefik.http.routers.pihole.rule=PathPrefix(`/pihole`)
+    # - traefik.http.middlewares.piholehttp.stripprefix.prefixes=/pihole
+    # The prefix should start with a slash. If you don't use a prefix, leave this field
+    # empty. Setting this field to an incorrect value may result in the web interface not
+    # being accessible.
+    # Don't use this setting if you are not using a reverse proxy!
+    #
+    # Possible values are:
+    #     valid URL prefix or empty
+    prefix = ""
 
   [webserver.interface]
     # Should the web interface use the boxed layout?
@@ -831,7 +895,7 @@
     # individually.
     client_history_global_max = true
 
-    # Allow destructive API calls (e.g. deleting all queries, powering off the system, ...)
+    # Allow destructive API calls (e.g. restart DNS server, flush logs, ...)
     allow_destructive = true
 
     [webserver.api.temp]
@@ -882,12 +946,6 @@
   #     <any Pi-hole macvendor database>
   macvendor = "/etc/pihole/macvendor.db"
 
-  # The old config file of Pi-hole used before v6.0
-  #
-  # Possible values are:
-  #     <any Pi-hole setupVars file>
-  setupVars = "/etc/pihole/setupVars.conf"
-
   # An optional file containing a pcap capture of the network traffic. This file is used
   # for debugging purposes only. If you don't know what this is, you don't need it.
   # Setting this to an empty string disables pcap recording. The file must be writable
@@ -931,9 +989,9 @@
   #       Hide domains and clients. This setting disables Top Domains, Top Ads, Top
   #       Clients and Clients over time.
   #   - 3
-  #       Anonymize everything. This setting disabled almost any statistics and query
+  #       Anonymize everything. This setting disables almost any statistics and query
   #       analysis. There will be no long-term database logging and no Query Log. You
-  #       will also loose most regex features.
+  #       will also lose most regex features.
   privacylevel = 3 ### CHANGED, default = 0
 
   # During startup, in some configurations, network interfaces appear only late during
@@ -959,6 +1017,10 @@
   addr2line = true
 
   # Should FTL load additional dnsmasq configuration files from /etc/dnsmasq.d/?
+  # Warning: This is an advanced setting and should only be used with care.
+  # Incorrectly formatted or config files specifying options which can only be defined
+  # once can result in conflicts with the automatic configuration of Pi-hole (see
+  # /etc/pihole/dnsmasq.conf) and may stop DNS resolution from working.
   etc_dnsmasq_d = true ### CHANGED, default = false
 
   # Additional lines to inject into the generated dnsmasq configuration.
@@ -1138,5 +1200,5 @@
   all = false
 
 # Configuration statistics:
-# 152 total entries out of which 139 entries are default
-# --> 13 entries are modified
+# 155 total entries out of which 138 entries are default
+# --> 17 entries are modified
