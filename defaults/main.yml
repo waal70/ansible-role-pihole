@@ -4,8 +4,15 @@ iface_dummy: "eth53"
 iface_dummy_private_ipv4_prefix: "10.1.1."
 iface_dummy_private_ipv6_prefix: "2a10:3781:3623:d0::"
 
-install_pihole: true # switch to (re-)install pihole
-do_pihole: true # switch to refresh adlists/pihole-config
+# valid options:
+# - install: does an installation AND refreshes adlists AND sets local DNS
+# - adlists: Upgrades pihole AND refreshes adlists AND sets local DNS
+# - local: Upgrades pihole AND sets local DNS
+pihole_action: "local"
+
+pihole_localdns_newlist:
+   - "1.2.3.4 myserver.authoritativedomain"
+pihole_localdns_authoritativedomain: "authoritativedomain"
 
 # My provider documents these on https://freedom.nl/page/servers
 # Forwarder 1 and 2 are required

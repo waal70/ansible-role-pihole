@@ -7,14 +7,14 @@
 
 - name: Feedback on presence of gravity db and extrapolated pi-hole status
   ansible.builtin.debug:
-    msg: "Pi-hole is present on this system"
+    msg: "Pi-hole is (already) present on this system"
   when: pihole_db.stat.exists
 
 # Even when gravity.db is found, we still may wish to re-install
 - name: Include tasks to actually (re-)install pihole
   ansible.builtin.import_tasks:
     file: install-pihole.yml
-  when: install_pihole
+  when: pihole_action == "install"
 
 - name: Upgrade pi-hole if it is already installed
   ansible.builtin.command:
@@ -23,7 +23,7 @@
     PIHOLE_SKIP_OS_CHECK: 'true'
   become: true
   register: pihole_update
-  when: pihole_db.stat.exists and not install_pihole
+  when: pihole_db.stat.exists and not pihole_action == "install"
   changed_when: "'Everything is up to date!' not in pihole_update.stdout"
 
 # Check if pihole-FTL is running. If not, we will try to fix it
@@ -45,7 +45,8 @@
 - name: Import tasks to update the gravity database with adlists, and white- and blacklists
   ansible.builtin.import_tasks:
     file: pihole-listmanage.yml
-  when: do_pihole or pihole_db.stat.exists or install_pihole
+  when:
+    - pihole_action != "local" and pihole_db.stat.exists
 
 # This directory should already be there
 - name: Create the dnsmasq config directory if it does not exist yet
@@ -63,21 +64,52 @@
 
 # In pi-hole web interface, this is known as the 'local DNS'
 # As this may contain sensitive info, the src is the private repository
-# You can include a custom.list in ./files as well, just put custom.list in the src: parameter
-# Remember to export PRIVATE_REPO!
+# Include yours in pihole_localdns_newlist or in the secrets include
 
-- name: Assert existence of PRIVATE_REPO environment variable
-  ansible.builtin.assert:
-    that:
-      - lookup('ansible.builtin.env', 'PRIVATE_REPO') | length > 0
-    fail_msg: "You have not set PRIVATE_REPO. Default will be '~' (user's home)"
-    success_msg: "Correctly set PRIVATE_REPO"
+- name: Get currently configured local DNS entries in Pi-hole
+  ansible.builtin.uri:
+    url: "http://{{ ansible_host }}/api/config/dns/hosts"
+    method: GET
+    return_content: true
+    status_code: 200
+  register: pihole_localdns
 
-- name: Place the file with custom DNS entries into pihole configuration folder
-  ansible.builtin.copy:
-    dest: /etc/pihole/custom.list
-    src: "{{ lookup('ansible.builtin.env', 'PRIVATE_REPO', default='~') }}/inventory/client.list"
-    mode: "0644"
-    owner: pihole
-    group: pihole
-    remote_src: false
+- name: Bulk get rid of current local DNS entries in Pi-hole. Also set authoritative domain to 'local' to avoid issues.
+  ansible.builtin.uri:
+    url: "http://{{ ansible_host }}/api/config"
+    method: PATCH
+    body_format: json
+    body: |
+        {
+           "config": {
+             "dns": {
+               "hosts": [],
+               "domain": "local"
+               }
+             }
+         }
+  when: pihole_localdns.json is defined and (pihole_localdns.json | length) > 0
+
+- name: Bulk set new domains. Set authoritative domain to {{ pihole_localdns_authoritativedomain }}
+  ansible.builtin.uri:
+    url: "http://{{ ansible_host }}/api/config"
+    method: PATCH
+    body_format: json
+    body: |
+       {
+          "config": {
+            "dns": {
+              "domain": "{{ pihole_localdns_authoritativedomain }}",
+              "hosts": {{ pihole_localdns_newlist | to_json }}
+              }
+            }
+        }
+  register: pihole_dnsdomain
+  retries: 3
+  delay: 5
+  when: pihole_localdns_newlist is defined and (pihole_localdns_newlist | length) > 0
+
+- name: Report out to user
+  ansible.builtin.debug:
+    msg: "Local DNS entries added: {{ pihole_localdns_newlist | length }}"
+  when: pihole_localdns_newlist is defined and (pihole_localdns_newlist | length) > 0

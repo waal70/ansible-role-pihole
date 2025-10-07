@@ -3,14 +3,14 @@
   ansible.builtin.file:
     path: /etc/systemd/system/pihole-FTL.service
     state: absent
-  when: install_pihole or pihole_ftl_status.status.ActiveState != "active"
+  when: pihole_action == "install" or pihole_ftl_status.status.ActiveState != "active"
 
 - name: Correct service startup file in init.d (might be necessary on some hardware)
   ansible.builtin.template:
     src: etc/init.d/pihole-FTL.j2
     dest: /etc/init.d/pihole-FTL
     mode: "0755"
-  when: install_pihole or pihole_ftl_status.status.ActiveState != "active"
+  when: pihole_action == "install" or pihole_ftl_status.status.ActiveState != "active"
 
 - name: Start/restart the pihole-FTL service
   ansible.builtin.systemd_service:
@@ -18,4 +18,4 @@
     name: pihole-FTL
     state: started
     enabled: true
-  when: install_pihole or pihole_ftl_status.status.ActiveState != "active"
+  when: pihole_action == "install" or pihole_ftl_status.status.ActiveState != "active"
