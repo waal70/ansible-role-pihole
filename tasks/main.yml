@@ -12,10 +12,9 @@
         - "{{ lookup('env', 'PRIVATE_REPO') | default('~') }}/ansible-vault/{{ ansible_role_name }}-vars.yml"
       skip: true
 # First, make sure the system is up to date
-- name: Update apt cache
+- name: Ensure apt is up-to-date
   ansible.builtin.apt:
-    update_cache: true
-    upgrade: true
+    upgrade: full
     cache_valid_time: 3600
 
 - name: Interface detection

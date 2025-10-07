@@ -28,7 +28,7 @@
 
 # Check if pihole-FTL is running. If not, we will try to fix it
 - name: Check status of pihole-FTL
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     name: pihole-FTL
   register: pihole_ftl_status
 
