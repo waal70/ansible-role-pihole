@@ -50,3 +50,8 @@
     cmd: "curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended"
   when: pihole_action == "install"
   changed_when: true
+
+- name: Reset the pihole_db variable after install
+  ansible.builtin.stat:
+    path: /etc/pihole/gravity.db
+  register: pihole_db
