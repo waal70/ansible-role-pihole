@@ -13,6 +13,8 @@ pihole_action: "local"
 pihole_localdns_newlist:
    - "1.2.3.4 myserver.authoritativedomain"
 pihole_localdns_authoritativedomain: "authoritativedomain"
+pihole_localdns_wildcard_ipv4: 1.2.3.4
+pihole_localdns_wildcard_ipv6: ff:00:0:0:0:0:0:1
 
 # My provider documents these on https://freedom.nl/page/servers
 # Forwarder 1 and 2 are required
