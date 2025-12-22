@@ -16,7 +16,7 @@
     file: install-pihole.yml
   when: pihole_action == "install"
 
-- name: Refresh check wheter pi-hole is already installed, by checking presence of gravity database
+- name: Refresh check whether pi-hole is already installed, by checking presence of gravity database
   ansible.builtin.stat:
     path: /etc/pihole/gravity.db
   register: pihole_db
