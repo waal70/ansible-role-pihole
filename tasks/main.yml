@@ -18,11 +18,7 @@
     cache_valid_time: 3600
 
 - name: Interface detection
-  ansible.builtin.import_tasks: interface-detection.yml
-
-- name: Display target interface
-  ansible.builtin.debug:
-    msg: "Applying pihole on: {{ target_interface }}"
+  ansible.builtin.import_tasks: samba-detection.yml
 
 - name: Include pi-hole installation and configuration tasks
   ansible.builtin.import_tasks: pi-hole.yml

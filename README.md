@@ -1,21 +1,12 @@
 waal70.pihole
 =========
 
-Determines whether samba-ad-dc is active on this device. This means that DNS ports are taken.
-It will solve this by installing pihole on a dummy interface (eth53) and binding pihole to it.
+Determines whether samba-ad-dc is active on this device.
+If it is, it will update smb.conf to take out dns forwarders, and have samba listen on a different dns port.
+This also requires you set the authoritative domain for which samba is authoritative, pihole_localdns_authoritativedomain
+It will then put the relevant stanzas in the dnsmasq.conf
 
 If requested, it will purge the pihole adlist database and repopulate, using mongodb commands.
-
-In case of a dummy interface, it will take the prefix as mentioned in defaults/main.yml and it will
-append the same last octet of your main interface:
-Suppose you have a dummy prefix of 10.1.1., and your main ip address is 10.0.0.5,
-your dummy ip will be 10.1.1.5, and the IPv6 will end in ::5/64
-
-Make sure you use a prefix that resides in the private (RFC1918) address space if IPv4 and then choose one
-that does not collide with your local IP-numbering scheme (i.e. VLANs). If you do not do this, you will
-risk routing errors and/or unavailability.
-Make sure you use a IPv6 prefix that resides in your own numbering block (i.e. fits within the
-delegated address block).
 
 Requirements
 ------------
@@ -33,10 +24,10 @@ Role Variables
 
     install_pihole: false # switch to (re-)install pihole  
 
-The name of the dummy interface  
-    iface_dummy: "eth53"  
-    iface_dummy_private_ipv4_prefix: "10.1.1."  
-    iface_dummy_private_ipv6_prefix: "2a10:3781:3623:d0::"  
+The port where you want SAMBA to have its DNS listen
+    samba_dns_port: "5353"
+The FQ domain name for which the samba built-in DNS is authoritative
+    samba_realm: "samba.authoritativedomain"
 
 My provider documents these on [https://freedom.nl/page/servers], use your own if needed  
 Forwarder 1 and 2 are required  

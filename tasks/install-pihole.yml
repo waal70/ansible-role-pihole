@@ -11,10 +11,6 @@
       - curl
     state: present
 
-- name: Ensure dummy interface is present (if needed)
-  ansible.builtin.include_tasks: install-dummy-interface.yml
-  when: install_dummy
-
 - name: Create pihole group
   ansible.builtin.group:
     name: pihole

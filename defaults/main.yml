@@ -1,8 +1,11 @@
 ---
 # defaults file for waal70.pihole
-iface_dummy: "eth53"
-iface_dummy_private_ipv4_prefix: "10.1.1."
-iface_dummy_private_ipv6_prefix: "2a10:3781:3623:d0::"
+# Tell the port you want the samba built-in DNS server to listen on
+samba_dns_port: "5353"
+# Allocate the variable that tells us if samba is present, the playbook will update this if it finds samba
+samba_present: false
+# Set your samba realm here, if you have a samba AD DC
+samba_realm: "samba.authoritativedomain"
 
 # valid options:
 # - install: does an installation AND refreshes adlists AND sets local DNS

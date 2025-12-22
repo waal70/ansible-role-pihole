@@ -1,0 +1,40 @@
+---
+- name: Check for existence of smb.conf
+  ansible.builtin.stat:
+    path: /etc/samba/smb.conf
+  register: smb_conf
+
+- name: Check for status of samba-ad-dc service
+  ansible.builtin.systemd_service:
+    name: samba-ad-dc
+  register: service_status
+  changed_when: false
+
+- name: Final determination of target_interface
+  ansible.builtin.set_fact:
+    samba_present: true
+  when: smb_conf.stat.exists and service_status.status.ActiveState == "active"
+
+- name: "Tell user the samba realm"
+  ansible.builtin.debug:
+    msg: "Samba AD DC detected with realm {{ samba_realm }}"
+  when: samba_present
+
+- name: Comment out the dns forwarder
+  ansible.builtin.replace:
+    path: /etc/samba/smb.conf
+    regexp: '^.*dns forwarder ='
+    replace: '        # dns forwarder ='
+  when: samba_present
+
+- name: "Set the dns port in smb.conf"
+  ansible.builtin.lineinfile:
+    path: /etc/samba/smb.conf
+    regexp: '^.*dns port'
+    line: "        dns port = {{ samba_dns_port }}"
+    insertbefore: '^.*bind interfaces'
+  notify: Restart samba-ad-dc
+  when: samba_present
+
+- name: "Flush handlers if samba presence changed"
+  ansible.builtin.meta: flush_handlers
