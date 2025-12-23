@@ -10,6 +10,11 @@
     msg: "Pi-hole is (already) present on this system"
   when: pihole_db.stat.exists
 
+# Check to (un)install unbound. Do this before pihole install
+- name: Include role for unbound if so requested
+  ansible.builtin.include_role:
+    name: waal70.unbound
+
 # Even when gravity.db is found, we still may wish to re-install
 - name: Include tasks to actually (re-)install pihole
   ansible.builtin.import_tasks:

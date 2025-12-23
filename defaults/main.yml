@@ -60,7 +60,7 @@ pihole_etc_dnsmasq_d: true # If true, enables the /etc/dnsmasq.d/ directory for 
 # "BIND" (binds only to specified interfaces),
 # "ALL" (responds to all queries, risky),
 # "NONE" (no configuration added, manual setup required).
-pihole_listening_mode: "SINGLE"
+pihole_listening_mode: "LOCAL"
 pihole_cname_deep_inspect: true # Enables deep CNAME inspection; may increase CPU usage on low-end devices.
 pihole_block_esni: true # Blocks _esni. subdomains to prevent ESNI-based encrypted SNI tracking.
 pihole_edns0_ecs: true # Enables EDNS0 client subnet (ECS) support for retrieving client IPs behind NAT.

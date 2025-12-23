@@ -1,12 +1,12 @@
 # Managed from Ansible
 interface={{ ansible_default_ipv4.interface }}
-except-interface=lo
-bind-interfaces
+#except-interface=lo
+#bind-interfaces
 
 # Wildcard entries (if any)
 address=/.{{ pihole_local_domain }}/{{ pihole_localdns_wildcard_ipv4 }}
 address=/.{{ pihole_local_domain }}/{{ pihole_localdns_wildcard_ipv6 }}
-rebind-domain-ok=/{{ pihole_local_domain }}/
+rebind-domain-ok=/.{{ pihole_local_domain }}/
 
 # Block for forwarding to Samba AD DC DNS server (if any)
 {% if samba_present %}
