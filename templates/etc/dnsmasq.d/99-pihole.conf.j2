@@ -4,12 +4,12 @@ except-interface=lo
 bind-interfaces
 
 # Wildcard entries (if any)
-address=/.{{ pihole_localdns_authoritativedomain }}/{{ pihole_localdns_wildcard_ipv4 }}
-address=/.{{ pihole_localdns_authoritativedomain }}/{{ pihole_localdns_wildcard_ipv6 }}
-rebind-domain-ok=/{{ pihole_localdns_authoritativedomain }}/
+address=/.{{ pihole_local_domain }}/{{ pihole_localdns_wildcard_ipv4 }}
+address=/.{{ pihole_local_domain }}/{{ pihole_localdns_wildcard_ipv6 }}
+rebind-domain-ok=/{{ pihole_local_domain }}/
 
 # Block for forwarding to Samba AD DC DNS server (if any)
 {% if samba_present %}
-server=/home.andrecatherine.net/::1#5353
-server=/home.andrecatherine.net/127.0.0.1#5353
+server=/{{ samba_realm }}/::1#5353
+server=/{{ samba_realm }}/127.0.0.1#5353
 {% endif %}

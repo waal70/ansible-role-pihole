@@ -12,20 +12,89 @@ samba_realm: "samba.authoritativedomain"
 # - adlists: Upgrades pihole AND refreshes adlists AND sets local DNS
 # - local: Upgrades pihole AND sets local DNS
 pihole_action: "local"
-
 pihole_localdns_newlist:
    - "1.2.3.4 myserver.authoritativedomain"
-pihole_localdns_authoritativedomain: "authoritativedomain"
+pihole_local_domain: "authoritativedomain"
 pihole_localdns_wildcard_ipv4: 1.2.3.4
 pihole_localdns_wildcard_ipv6: ff:00:0:0:0:0:0:1
 
 # My provider documents these on https://freedom.nl/page/servers
 # Forwarder 1 and 2 are required
-forward_dns_1: "185.93.175.43" # Google would be 8.8.8.8
-forward_dns_2: "185.232.98.76" # Google would be 8.8.4.4
-# Use 3 and 4 for IPv6. You can also leave them empty
-forward_dns_3: "2a10:3780:2:52:185:93:175:43"
-forward_dns_4: "2a10:3780:2:53:185:232:98:76"
+pihole_upstream_dns:
+   - "185.93.175.43"
+   - "185.232.98.76"
+   - "2a10:3780:2:52:185:93:175:43"
+   - "2a10:3780:2:53:185:232:98:76"
+
+## Pi-hole as a recursive DNS server
+## https://docs.pi-hole.net/guides/dns/unbound/
+## Note that setting unbound to true will ignore your upstream DNS settings
+pihole_enable_unbound: false
+unbound_verbosity: 0 # https://docs.pi-hole.net/guides/dns/unbound/#add-logging-to-unbound
+
+## Pi-hole general configuration
+## pihole_version: 6.1.4 # https://github.com/pi-hole/pi-hole/releases
+pihole_webpassword: "" # Web interface password set via `pihole -a -p`; stored as a hash in `pihole.toml`.
+pihole_web_serve_all: true # If true, Pi-hole web server will serve all files in /var/www/html, not just those for the Pi-hole interface.
+pihole_web_restore: false # If true, restores the default Pi-hole web interface files from /usr/share/pihole.
+# Sets the Pi-hole web interface domain using the system hostname and local domain (e.g., "pihole-node1.lan").
+pihole_web_domain: "{{ ansible_hostname }}.{{ pihole_local_domain }}"
+# List of “+/-subnets” restricting webserver access;
+# empty means allow all. E.g. "+127.0.0.1,+[::1]" denies all except 127.0.0.1 and ::1; "+192.168.0.0/16" allows that subnet only;
+pihole_web_acl: ""
+# Defines web interface ports: HTTP (80), HTTPS (443), with IPv4/IPv6 support and optional fallback if ports are in use.
+pihole_web_port: "80o,443os,[::]:80o,[::]:443os"
+pihole_web_session_timeout: 1800 # Session timeout in seconds for the Pi-hole web interface (default 1800 = 30 minutes).
+pihole_web_boxed_layout: true # If true, the Pi-hole web interface uses a "boxed" layout.
+# Web interface theme pihole_web_theme: "default-auto".
+# One of: "default-auto", "default-light", "default-dark", "default-darker", "high-contrast", "high-contrast-dark", "lcars".
+pihole_web_theme: "default-dark"
+# Controls query logging and data visibility: 0 = full logging, 1 = hide domains, 2 = hide domains & clients, 3 = anonymize everything.
+pihole_privacy_level: "3"
+pihole_delay_startup: "10"
+pihole_query_logging: false # Log DNS queries and replies to pihole.log.
+pihole_etc_dnsmasq_d: true # If true, enables the /etc/dnsmasq.d/ directory for custom dnsmasq configurations.
+# defines how Pi-hole responds to DNS queries:
+# "LOCAL" (only local networks),
+# "SINGLE" (only on the specified interface),
+# "BIND" (binds only to specified interfaces),
+# "ALL" (responds to all queries, risky),
+# "NONE" (no configuration added, manual setup required).
+pihole_listening_mode: "SINGLE"
+pihole_cname_deep_inspect: true # Enables deep CNAME inspection; may increase CPU usage on low-end devices.
+pihole_block_esni: true # Blocks _esni. subdomains to prevent ESNI-based encrypted SNI tracking.
+pihole_edns0_ecs: true # Enables EDNS0 client subnet (ECS) support for retrieving client IPs behind NAT.
+pihole_ignore_localhost: false # If true, Pi-hole ignores and does not log queries from localhost (127.0.0.1 and ::1).
+pihole_domain_needed: false # If "true", single-label (dotless) queries are blocked; "false" forwards them upstream.
+pihole_bogus_priv: true # If "true", reverse lookups for private IPs return NXDOMAIN instead of forwarding.
+pihole_dns_cache_size: 10000 # # Sets the DNS cache size; higher values improve caching but increase memory usage. Default recommended: 10000.
+pihole_dnssec: true # Validate DNS replies using DNSSEC?
+pihole_show_dnssec: true # Enable DNSSEC logging and statistics.
+pihole_resolve_ipv4: true # Should FTL resolve IPv4 addresses to hostnames?
+pihole_resolve_ipv6: true # Should FTL resolve IPv6 addresses to hostnames?
+pihole_network_names: true # Should FTL attempt to derive client names from the network table?
+# Controls PTR query refresh: "IPV4_ONLY" (IPv4 only, recommended), "ALL" (IPv4 & IPv6), "UNKNOWN" (resolve once), "NONE" (disable).
+pihole_refresh_names: "IPV4_ONLY"
+pihole_rate_limit_count: 1000 # Maximum number of DNS queries allowed per client within the rate-limiting interval before being temporarily blocked.
+pihole_rate_limit_interval: 60 # Time interval (in seconds) for rate limiting; clients exceeding the query limit within this period will be temporarily blocked.
+pihole_reply_when_busy: "ALLOW" # Defines how Pi-hole responds when the gravity database is unavailable: "BLOCK", "ALLOW", "REFUSE", or "DROP".
+pihole_blocking_mode: "NULL" # Sets the blocking mode used by Pi-hole: "NODATA", "NXDOMAIN", "NODATA-IPv4", "NODATA-IPv6", or "NULL".
+pihole_block_mozilla_canary: true # Blocks Firefox from automatically enabling DNS-over-HTTPS (DoH).
+pihole_block_icloud_pr: true # If true, Pi-hole blocks Apple's iCloud Private Relay domains to prevent bypassing network filtering.
+pihole_ptr: "HOSTNAMEFQDN" # Defines the response for PTR queries to local interface addresses: "NONE", "HOSTNAME", "HOSTNAMEFQDN", or "PI.HOLE".
+pihole_max_db_days: 0 # Number of days to store DNS query history in the database (default: 91).
+pihole_db_interval: 60 # Time interval (in seconds) for writing queries to the database (default: 60).
+pihole_db_import: false # If true, imports existing pihole-FTL database from /etc/pihole/pihole-FTL.db if it exists.
+pihole_ntp_active: false # Enable or disable NTP server for IPv4 and IPv6 ("true" = listen on both).
+pihole_rtc_utc: false # Whether RTC should be maintained in UTC.
+pihole_http_headers:
+   - "Content-Security-Policy: default-src 'self' 'unsafe-inline';"
+   - "X-Frame-Options: DENY"
+   - "X-XSS-Protection: 0"
+   - "X-Content-Type-Options: nosniff"
+   - "Referrer-Policy: strict-origin-when-cross-origin"
+   # - "X-DNS-Prefetch-Control: off"
+   # - "Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
 
 adlists: "{{ lookup('file', 'myadlist.json') | from_json }}"
 
