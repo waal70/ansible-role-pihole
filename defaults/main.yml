@@ -54,6 +54,7 @@ pihole_privacy_level: "3"
 pihole_delay_startup: "10"
 pihole_query_logging: false # Log DNS queries and replies to pihole.log.
 pihole_etc_dnsmasq_d: true # If true, enables the /etc/dnsmasq.d/ directory for custom dnsmasq configurations.
+pihole_hide_dnsmasq_warn: true # Hides dnsmasq warnings
 # defines how Pi-hole responds to DNS queries:
 # "LOCAL" (only local networks),
 # "SINGLE" (only on the specified interface),

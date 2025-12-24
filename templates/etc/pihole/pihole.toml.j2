@@ -1418,7 +1418,7 @@
   #
   # Allowed values are:
   #     true or false
-  hide_dnsmasq_warn = false
+  hide_dnsmasq_warn = {{ pihole_hide_dnsmasq_warn | lower }}
 
   [misc.check]
     # Pi-hole is very lightweight on resources. Nevertheless, this does not mean that you
