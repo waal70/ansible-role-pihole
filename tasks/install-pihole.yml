@@ -44,5 +44,4 @@
 - name: Install pi-hole by piping to bash (may be insecure) # noqa: command-instead-of-module # noqa: risky-shell-pipe
   ansible.builtin.shell:
     cmd: "curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended"
-  when: pihole_action == "install"
   changed_when: true

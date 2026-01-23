@@ -19,7 +19,7 @@
 - name: Include tasks to actually (re-)install pihole
   ansible.builtin.import_tasks:
     file: install-pihole.yml
-  when: pihole_action == "install"
+  when: pihole_action == "reinstall" or not pihole_db.stat.exists
 
 # (Re)-write the pihole.toml configuration file according to our settings
 - name: Rewrite the settings file in case we made config changes
@@ -41,7 +41,7 @@
     PIHOLE_SKIP_OS_CHECK: 'true'
   become: true
   register: pihole_update
-  when: pihole_db.stat.exists and not pihole_action == "install"
+  when: pihole_db.stat.exists and not pihole_action == "reinstall"
   changed_when: "'Everything is up to date!' not in pihole_update.stdout"
 
 # Check if pihole-FTL is running. If not, we will try to fix it
