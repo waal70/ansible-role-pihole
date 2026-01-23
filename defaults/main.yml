@@ -35,7 +35,7 @@ unbound_verbosity: 0 # https://docs.pi-hole.net/guides/dns/unbound/#add-logging-
 ## Pi-hole general configuration
 ## pihole_version: 6.1.4 # https://github.com/pi-hole/pi-hole/releases
 pihole_webpassword: "" # Web interface password set via `pihole -a -p`; stored as a hash in `pihole.toml`.
-pihole_web_serve_all: true # If true, Pi-hole web server will serve all files in /var/www/html, not just those for the Pi-hole interface.
+pihole_web_serve_all: false # If true, Pi-hole web server will serve all files in /var/www/html, not just those for the Pi-hole interface.
 pihole_web_restore: false # If true, restores the default Pi-hole web interface files from /usr/share/pihole.
 # Sets the Pi-hole web interface domain using the system hostname and local domain (e.g., "pihole-node1.lan").
 pihole_web_domain: "{{ ansible_hostname }}.{{ pihole_local_domain }}"
