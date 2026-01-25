@@ -12,7 +12,7 @@
   # Allowed values are:
   #     Array of IP addresses and/or hostnames, optionally with a port (#...)
   upstreams = [
-{% if pihole_enable_unbound %}
+{% if pihole_enable_unbound_greenlight %}
     "127.0.0.1#5335"
 {% else %}
 {% for dns_server in pihole_upstream_dns %}

@@ -1,0 +1,29 @@
+---
+# Install unbound by including the role
+- name: Include role for unbound if so requested
+  ansible.builtin.include_role:
+    name: waal70.unbound
+
+- name: After returning from the role, check if unbound service is running
+  ansible.builtin.systemd_service:
+    name: unbound
+    state: restarted
+  register: unbound_status
+  retries: 10
+  delay: 5
+  until: unbound_status.status.ActiveState == 'active'
+
+- name: If we return from the role, we are greenlighted to rewrite pi-hole's config
+  ansible.builtin.set_fact:
+    pihole_enable_unbound_greenlight: "{{ unbound_status.status.ActiveState == 'active' }}"
+
+- name: Debug greenlight
+  ansible.builtin.debug:
+    msg: "Greenlicht is {{ pihole_enable_unbound_greenlight }}"
+
+- name: Rewrite the settings file, now reflecting unbound status
+  ansible.builtin.template:
+    src: etc/pihole/pihole.toml.j2
+    dest: /etc/pihole/pihole.toml
+    mode: "0644"
+  notify: Restart pihole-FTL

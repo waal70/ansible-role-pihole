@@ -1,11 +1,7 @@
 ---
 # defaults file for waal70.pihole
-# Tell the port you want the samba built-in DNS server to listen on
+# Tell the port you want the samba built-in DNS server to relocate to, should it be present
 samba_dns_port: "5353"
-# Allocate the variable that tells us if samba is present, the playbook will update this if it finds samba
-samba_present: false
-# Set your samba realm here, if you have a samba AD DC
-samba_realm: "samba.authoritativedomain"
 
 # valid options:
 # - install: does an installation AND refreshes adlists AND sets local DNS

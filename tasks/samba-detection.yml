@@ -10,23 +10,40 @@
   register: service_status
   changed_when: false
 
-- name: Final determination of target_interface
+- name: "Set flag that tells us samba is there ore not"
   ansible.builtin.set_fact:
-    samba_present: true
-  when: smb_conf.stat.exists and service_status.status.ActiveState == "active"
+    samba_present: "{{ (smb_conf.stat.exists and service_status.status.ActiveState == 'active') | bool }}"
+
+- name: Retrieve the samba realm
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      samba-tool domain info 127.0.0.1 | grep Domain | cut -c 20-
+  register: domain_info
+  changed_when: domain_info.rc != 0
+
+- name: Set fact for samba realm
+  ansible.builtin.set_fact:
+    samba_realm: domain_info.stdout
 
 - name: "Tell user the samba realm"
   ansible.builtin.debug:
-    msg: "Samba AD DC detected with realm {{ samba_realm }}"
+    msg: "This system runs a Samba AD DC. Its realm is {{ samba_realm }}"
   when: samba_present
 
-- name: Comment out the dns forwarder
+# If pihole is to run on this system, the samba ad is not forwarding, but receiving forwards
+# That is why we no longer need the forward stanza in smb.conf
+# Be careful not to restart samba until after pihole is proven working, or you will have
+# name resolution issues!
+# If running this while pihole is already installed, this will not change anything
+- name: Comment out the dns forwarder in smb.conf
   ansible.builtin.replace:
     path: /etc/samba/smb.conf
     regexp: '^.*dns forwarder ='
     replace: '        # dns forwarder ='
   when: samba_present
 
+# In order not to conflict with pihole, samba needs to be relocated to a different port
 - name: "Set the dns port in smb.conf"
   ansible.builtin.lineinfile:
     path: /etc/samba/smb.conf
@@ -35,6 +52,3 @@
     insertbefore: '^.*bind interfaces'
   notify: Restart samba-ad-dc
   when: samba_present
-
-- name: "Flush handlers if samba presence changed"
-  ansible.builtin.meta: flush_handlers

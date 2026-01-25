@@ -5,21 +5,23 @@
     path: /etc/pihole/gravity.db
   register: pihole_db
 
-- name: Feedback on presence of gravity db and extrapolated pi-hole status
+- name: Set a flag that tells us whether pi-hole was already present
+  ansible.builtin.set_fact:
+    pihole_present: "{{ pihole_db.stat.exists | default(false) }}"
+
+- name: Debug flags and settings
   ansible.builtin.debug:
-    msg: "Pi-hole is (already) present on this system"
-  when: pihole_db.stat.exists
+    msg: "pihole action is {{ pihole_action }}, pihole_present is {{ pihole_present }}"
 
-# Check to (un)install unbound. Do this before pihole install
-- name: Include role for unbound if so requested
-  ansible.builtin.include_role:
-    name: waal70.unbound
+- name: Irrespective of the pihole_enable_unbound setting, initial config is without unbound
+  ansible.builtin.set_fact:
+    pihole_enable_unbound_greenlight: false
 
-# Even when gravity.db is found, we still may wish to re-install
+# pihole_action "reinstall" overrides the check to install
 - name: Include tasks to actually (re-)install pihole
   ansible.builtin.import_tasks:
     file: install-pihole.yml
-  when: pihole_action == "reinstall" or not pihole_db.stat.exists
+  when: pihole_action == "reinstall" or not pihole_present
 
 # (Re)-write the pihole.toml configuration file according to our settings
 - name: Rewrite the settings file in case we made config changes
@@ -29,10 +31,18 @@
     mode: "0644"
   notify: Restart pihole-FTL
 
+# Everything is in place, so it should be safe to flush handlers, that may mean samba restart
+- name: Flush handlers after (re-)install
+  ansible.builtin.meta: flush_handlers
+
 - name: Refresh check whether pi-hole is already installed, by checking presence of gravity database
   ansible.builtin.stat:
     path: /etc/pihole/gravity.db
   register: pihole_db
+
+- name: Refresh the flag that tells us whether pi-hole is now present
+  ansible.builtin.set_fact:
+    pihole_present: "{{ pihole_db.stat.exists | default(false) }}"
 
 - name: Upgrade pi-hole if it is already installed
   ansible.builtin.command:
@@ -41,7 +51,7 @@
     PIHOLE_SKIP_OS_CHECK: 'true'
   become: true
   register: pihole_update
-  when: pihole_db.stat.exists and not pihole_action == "reinstall"
+  when: pihole_present and not pihole_action == "reinstall"
   changed_when: "'Everything is up to date!' not in pihole_update.stdout"
 
 # Check if pihole-FTL is running. If not, we will try to fix it
@@ -64,7 +74,7 @@
   ansible.builtin.import_tasks:
     file: pihole-listmanage.yml
   when:
-    - pihole_action != "local" and pihole_db.stat.exists
+    - pihole_action != "local" and pihole_present
 
 # This directory should already be there
 - name: Create the dnsmasq config directory if it does not exist yet

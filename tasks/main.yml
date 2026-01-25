@@ -17,8 +17,14 @@
     upgrade: full
     cache_valid_time: 3600
 
-- name: Interface detection
+# samba-detection will set boolean "samba_present" and reconfigure smb.conf if present
+# it will not restart services, in order not to mess with name resolution during install
+- name: Detect the presence of a Samba-based Active Directory on this system
   ansible.builtin.import_tasks: samba-detection.yml
 
 - name: Include pi-hole installation and configuration tasks
   ansible.builtin.import_tasks: pi-hole.yml
+
+- name: Include tasks to add unbound to pi-hole
+  ansible.builtin.include_tasks: install-unbound.yml
+  when: pihole_enable_unbound

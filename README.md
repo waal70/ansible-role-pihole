@@ -26,8 +26,6 @@ Role Variables
 
 The port where you want SAMBA to have its DNS listen
     samba_dns_port: "5353"
-The FQ domain name for which the samba built-in DNS is authoritative
-    samba_realm: "samba.authoritativedomain"
 
 My provider documents these on [https://freedom.nl/page/servers], use your own if needed  
 Forwarder 1 and 2 are required  

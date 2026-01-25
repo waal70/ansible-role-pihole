@@ -5,6 +5,10 @@
 # install, this presumes a config-directory, because the non-interactive pi-hole
 # script expects setupVars.conf. This is why we need to perform
 # some tasks doubly and through this script.
+- name: Override pihole_action, no matter its original
+  ansible.builtin.set_fact:
+    pihole_action: "install"
+
 - name: Ensure prerequisites are present for pihole installation
   ansible.builtin.apt:
     name:
@@ -25,7 +29,6 @@
     shell: /usr/sbin/nologin
     state: present
 
-# This is the directory where the install script will expect setupVars.conf
 - name: Create the pihole config directory if it does not exist yet
   ansible.builtin.file:
     path: /etc/pihole
