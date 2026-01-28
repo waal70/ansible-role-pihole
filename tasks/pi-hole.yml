@@ -23,6 +23,36 @@
     file: install-pihole.yml
   when: pihole_action == "reinstall" or not pihole_present
 
+# Use a certificate from certbot if available. The toml says to look in "/etc/pihole/tls.pem"
+# pihole_certbot_certs_location is defined in defaults/main.yml and should contain the path to the certbot certs
+- name: Check for certbot certificates
+  ansible.builtin.stat:
+    path: "{{ pihole_certbot_certs_location }}/privkey1.pem"
+  register: pihole_certbot_certs
+  delegate_to: localhost
+
+- name: Read the files' content into a variable
+  ansible.builtin.slurp:
+    path: "{{ item }}"
+  register: _file_content
+  no_log: true
+  with_items:
+    - "{{ pihole_certbot_certs_location }}/cert1.pem"
+    - "{{ pihole_certbot_certs_location }}/privkey1.pem"
+  when: pihole_certbot_certs.stat.exists
+  delegate_to: localhost
+
+- name: Copy into the tls.pem on the pi-hole expected location
+  ansible.builtin.copy:
+    content: "{{ _file_content.results[0].content | b64decode }}\n{{ _file_content.results[1].content | b64decode }}"
+    dest: /etc/pihole/tls.pem
+    mode: "0400"
+    owner: pihole
+    group: pihole
+  when: pihole_certbot_certs.stat.exists
+  notify: Restart pihole-FTL
+  no_log: true
+
 # (Re)-write the pihole.toml configuration file according to our settings
 - name: Rewrite the settings file in case we made config changes
   ansible.builtin.template:

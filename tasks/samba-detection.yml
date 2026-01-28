@@ -24,7 +24,7 @@
 
 - name: Set fact for samba realm
   ansible.builtin.set_fact:
-    samba_realm: domain_info.stdout
+    samba_realm: "{{ domain_info.stdout }}"
 
 - name: "Tell user the samba realm"
   ansible.builtin.debug:
