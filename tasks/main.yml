@@ -28,3 +28,54 @@
 - name: Include tasks to add unbound to pi-hole
   ansible.builtin.include_tasks: install-unbound.yml
   when: pihole_enable_unbound
+
+# In pi-hole web interface, this is known as the 'local DNS'
+# As this may contain sensitive info, the src is the private repository
+# Include yours in pihole_localdns_newlist or in the secrets include
+- name: Get currently configured local DNS entries in Pi-hole
+  ansible.builtin.uri:
+    url: "http://{{ ansible_host }}/api/config/dns/hosts"
+    method: GET
+    return_content: true
+    status_code: 200
+  register: pihole_localdns
+
+- name: Bulk get rid of current local DNS entries in Pi-hole. Also set authoritative domain to 'local' to avoid issues.
+  ansible.builtin.uri:
+    url: "http://{{ ansible_host }}/api/config"
+    method: PATCH
+    body_format: json
+    body: |
+        {
+           "config": {
+             "dns": {
+               "hosts": [],
+               "domain": "local"
+               }
+             }
+         }
+  when: pihole_localdns.json is defined and (pihole_localdns.json | length) > 0
+
+- name: Bulk set new domains. Set authoritative domain to {{ pihole_local_domain }}
+  ansible.builtin.uri:
+    url: "http://{{ ansible_host }}/api/config"
+    method: PATCH
+    body_format: json
+    body: |
+       {
+          "config": {
+            "dns": {
+              "domain": "{{ pihole_local_domain }}",
+              "hosts": {{ pihole_localdns_newlist | to_json }}
+              }
+            }
+        }
+  register: pihole_dnsdomain
+  retries: 3
+  delay: 5
+  when: pihole_localdns_newlist is defined and (pihole_localdns_newlist | length) > 0
+
+- name: Report out to user
+  ansible.builtin.debug:
+    msg: "Local DNS entries added: {{ pihole_localdns_newlist | length }}"
+  when: pihole_localdns_newlist is defined and (pihole_localdns_newlist | length) > 0
