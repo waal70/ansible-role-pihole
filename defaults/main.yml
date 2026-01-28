@@ -14,7 +14,7 @@ pihole_local_domain: "authoritativedomain"
 pihole_localdns_wildcard_ipv4: 1.2.3.4
 pihole_localdns_wildcard_ipv6: ff:00:0:0:0:0:0:1
 
-pihole_certbot_certs_location: "/etc/letsencrypt/live/{{ ansible_hostname }}/"
+pihole_certbot_certs_location: "/etc/letsencrypt/live/{{ ansible_facts['hostname'] }}/"
 
 # My provider documents these on https://freedom.nl/page/servers
 # Forwarder 1 and 2 are required
@@ -36,7 +36,7 @@ pihole_webpassword: "" # Web interface password set via `pihole -a -p`; stored a
 pihole_web_serve_all: false # If true, Pi-hole web server will serve all files in /var/www/html, not just those for the Pi-hole interface.
 pihole_web_restore: false # If true, restores the default Pi-hole web interface files from /usr/share/pihole.
 # Sets the Pi-hole web interface domain using the system hostname and local domain (e.g., "pihole-node1.lan").
-pihole_web_domain: "{{ ansible_hostname }}.{{ pihole_local_domain }}"
+pihole_web_domain: "{{ ansible_facts['hostname'] }}.{{ pihole_local_domain }}"
 # List of “+/-subnets” restricting webserver access;
 # empty means allow all. E.g. "+127.0.0.1,+[::1]" denies all except 127.0.0.1 and ::1; "+192.168.0.0/16" allows that subnet only;
 pihole_web_acl: ""

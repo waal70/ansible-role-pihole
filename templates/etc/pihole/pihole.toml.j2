@@ -167,7 +167,7 @@
   #
   # Allowed values are:
   #     a valid interface name
-  interface = "{{ ansible_default_ipv4.interface }}" ### CHANGED, default = ""
+  interface = "{{ ansible_facts['default_ipv4'].interface }}" ### CHANGED, default = ""
 
   # Add an A, AAAA and PTR record to the DNS. This adds a singular name to the DNS with
   # associated IPv4 (A) and IPv6 (AAAA) records

@@ -1,5 +1,5 @@
 # Managed from Ansible
-interface={{ ansible_default_ipv4.interface }}
+interface={{ ansible_facts['default_ipv4'].interface }}
 #except-interface=lo
 #bind-interfaces
 
