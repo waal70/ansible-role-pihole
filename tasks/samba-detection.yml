@@ -21,10 +21,11 @@
       samba-tool domain info 127.0.0.1 | grep Domain | cut -c 20-
   register: domain_info
   changed_when: domain_info.rc != 0
+  when: samba_present
 
 - name: Set fact for samba realm
   ansible.builtin.set_fact:
-    samba_realm: "{{ domain_info.stdout }}"
+    samba_realm: "{{ domain_info.stdout | default('WORKGROUP') }}"
 
 - name: "Tell user the samba realm"
   ansible.builtin.debug:
