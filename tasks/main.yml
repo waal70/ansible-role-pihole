@@ -32,11 +32,16 @@
 # In pi-hole web interface, this is known as the 'local DNS'
 # As this may contain sensitive info, the src is the private repository
 # Include yours in pihole_localdns_newlist or in the secrets include
+
+- name: Wait a little to let new settings settle in, before proceeding to DNS configuration
+  ansible.builtin.wait_for:
+    timeout: 5
+  delegate_to: localhost
+
 - name: Get currently configured local DNS entries in Pi-hole
   ansible.builtin.uri:
     url: "http://{{ ansible_host }}/api/config/dns/hosts"
     method: GET
-    return_content: true
     status_code: 200
   register: pihole_localdns
 
@@ -54,6 +59,7 @@
                }
              }
          }
+    validate_certs: false
   when: pihole_localdns.json is defined and (pihole_localdns.json | length) > 0
 
 - name: Bulk set new domains. Set authoritative domain to {{ pihole_local_domain }}
@@ -70,6 +76,7 @@
               }
             }
         }
+    validate_certs: false
   register: pihole_dnsdomain
   retries: 3
   delay: 5
