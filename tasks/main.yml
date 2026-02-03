@@ -9,7 +9,7 @@
     file: "{{ item }}"
   with_first_found:
     - files:
-        - "{{ lookup('env', 'PRIVATE_REPO') | default('~') }}/{{ ansible_vault }}/{{ ansible_role_name }}-vars.yml"
+        - "{{ private_repo }}/{{ ansible_vault }}/{{ ansible_role_name }}-vars.yml"
       skip: true
 # First, make sure the system is up to date
 - name: Ensure apt is up-to-date
