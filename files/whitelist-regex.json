@@ -43,5 +43,14 @@
         "date_added": 1730662100,
         "date_modified": 1730662100,
         "comment": "Ansible pre-configured - DUMPERT"
+    },
+    {
+        "id": 99,
+        "type": 2,
+        "domain": "(\\.|^)bbvms\\.com$",
+        "enabled": 1,
+        "date_added": 1730662100,
+        "date_modified": 1730662100,
+        "comment": "Ansible pre-configured - HWC Meulenhoff"
     }
 ]
